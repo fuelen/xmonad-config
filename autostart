@@ -9,19 +9,18 @@ function run {
 # increase trackpoint sensitivity
 xinput set-prop "PS/2 Generic Mouse" "Device Accel Constant Deceleration" 0.5
 
-export QT_QPA_PLATFORMTHEME=gtk2
+export QT_QPA_PLATFORMTHEME=qt5ct
 
 feh --bg-scale ~/Pictures/Wallpapers/geometry.jpg
-run pasystray
-run compton --config ~/.config/compton/compton.conf
+run picom --config ~/.config/compton/compton.conf
+run albert
+run pasystray --notify=sink_default
 run copyq
 run nm-applet
 run guake
-# run shutter --min_at_startup
 run indicator-kdeconnect
 run stalonetray
 run qxkb
 run slack
 run telegram-desktop
-run albert
-# run cantata
+run blueman-tray

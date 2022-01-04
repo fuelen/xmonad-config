@@ -1,18 +1,18 @@
-import XMonad
-import XMonad.Config.Desktop
-import XMonad.Hooks.DynamicLog
-import System.IO(hPutStrLn)
-import XMonad.Util.Run (spawnPipe)
-import XMonad.Hooks.EwmhDesktops(fullscreenEventHook)
-import XMonad.Hooks.ManageDocks(manageDocks)
-import XMonad.Hooks.Place(placeHook,fixed)
-import XMonad.Layout.NoBorders(smartBorders)
-import XMonad.Layout.ExcludeBorders
-import XMonad.Util.EZConfig
-import XMonad.Hooks.ManageHelpers(doFullFloat, isFullscreen)
-import Data.Char(toLower)
+import           Data.Char                    (toLower)
+import           System.IO                    (hPutStrLn)
+import           XMonad
+import           XMonad.Config.Desktop
+import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.EwmhDesktops    (fullscreenEventHook)
+import           XMonad.Hooks.ManageDocks     (manageDocks)
+import           XMonad.Hooks.ManageHelpers   (doFullFloat, isFullscreen)
+import           XMonad.Hooks.Place           (fixed, placeHook)
+import           XMonad.Layout.ExcludeBorders
+import           XMonad.Layout.NoBorders      (smartBorders)
+import           XMonad.Util.EZConfig
+import           XMonad.Util.Run              (spawnPipe)
 
-data Workspace = Workspace String
+newtype Workspace = Workspace String
 
 formatWorkspace (Workspace name) = name
 
@@ -30,7 +30,7 @@ makeWorkspaceClickable :: Int -> Workspace -> ClickableWorkspace
 makeWorkspaceClickable position workspace = ClickableWorkspace workspace ("super+" ++ show position)
 
 makeWorkspacesClickable :: [Workspace] -> [ClickableWorkspace]
-makeWorkspacesClickable workspaces = zipWith makeWorkspaceClickable [1..] workspaces
+makeWorkspacesClickable = zipWith makeWorkspaceClickable [1..]
 
 myClickableWorkspaces :: [ClickableWorkspace]
 myClickableWorkspaces = makeWorkspacesClickable workspaces
@@ -56,7 +56,7 @@ main = do
     modMask            = mod4Mask,
     terminal           = "alacritty",
     startupHook        = spawn "~/.xmonad/autostart",
-    workspaces         = map show $ myClickableWorkspaces,
+    workspaces         = map show myClickableWorkspaces,
     handleEventHook    = handleEventHook desktopConfig <+> fullscreenEventHook,
     manageHook         = myManageHook,
     layoutHook         = myLayoutHook,
@@ -71,12 +71,15 @@ main = do
         ppHiddenNoWindows = xmobarColor "#586e75" ""
       }
                          } `additionalKeysP` [
-      ("<Print>",                 spawn "deepin-screenshot"),
+      ("M-<F2>",                    spawn "albert toggle"),
+      ("<Print>",                 spawn "flameshot gui"),
       ("<XF86AudioMute>",         spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle"),
       ("<XF86AudioRaiseVolume>",  spawn "pactl set-sink-volume @DEFAULT_SINK@ +5%"),
       ("<XF86AudioLowerVolume>",  spawn "pactl set-sink-volume @DEFAULT_SINK@ -5%"),
-      ("<XF86MonBrightnessDown>", spawn "brightnessctl s 2%-"),
-      ("<XF86MonBrightnessUp>",   spawn "brightnessctl s +2%"),
+      ("<XF86MonBrightnessDown>", spawn $ notifyBrightnessChange "brightnessctl s 1%- -m"),
+      ("<XF86MonBrightnessUp>",   spawn $ notifyBrightnessChange "brightnessctl s +1% -m"),
       ("<XF86AudioMicMute>",      spawn "pactl set-source-mute @DEFAULT_SOURCE@ toggle"),
       ("<XF86Display>",           spawn "arandr")
                                              ]
+
+notifyBrightnessChange command = "notify-send ' ' -i notification-display-brightness -h int:value:$(" ++ command ++ " | sed -r 's/^.+,(.+)%.+$/\\1/') -h string:synchronous:brightness"
