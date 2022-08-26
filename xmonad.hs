@@ -3,7 +3,7 @@ import           System.IO                    (hPutStrLn)
 import           XMonad
 import           XMonad.Config.Desktop
 import           XMonad.Hooks.DynamicLog
-import           XMonad.Hooks.EwmhDesktops    (fullscreenEventHook)
+import           XMonad.Hooks.EwmhDesktops    (ewmhFullscreen)
 import           XMonad.Hooks.ManageDocks     (manageDocks)
 import           XMonad.Hooks.ManageHelpers   (doFullFloat, isFullscreen)
 import           XMonad.Hooks.Place           (fixed, placeHook)
@@ -37,7 +37,7 @@ myClickableWorkspaces = makeWorkspacesClickable workspaces
   where workspaces = [Workspace "browser", Workspace "editor", Workspace "chat", Workspace "other", Workspace "office"]
 
 myManageHook = composeAll
-   [ className =? "Chromium"        --> doShift (show $ myClickableWorkspaces !! 0) -- browser
+   [ className =? "Firefox"        --> doShift (show $ myClickableWorkspaces !! 0) -- browser
    , className =? "nvim-qt"         --> doShift (show $ myClickableWorkspaces !! 1) -- editor
    , className =? "Slack"           --> doShift (show $ myClickableWorkspaces !! 2) -- chat
    , className =? "TelegramDesktop" --> doShift (show $ myClickableWorkspaces !! 2) -- chat
@@ -52,12 +52,12 @@ myLayoutHook = smartBorders $ excludeBorders [ExcludeClassName "albert"] $ layou
 main = do
   xmobarTopProc    <- spawnPipe "xmobar ~/.xmonad/xmobar_top.hs"
   xmobarBottomProc <- spawnPipe "xmobar ~/.xmonad/xmobar_bottom.hs"
-  xmonad $ desktopConfig {
+  xmonad $ ewmhFullscreen $ desktopConfig {
     modMask            = mod4Mask,
     terminal           = "alacritty",
     startupHook        = spawn "~/.xmonad/autostart",
     workspaces         = map show myClickableWorkspaces,
-    handleEventHook    = handleEventHook desktopConfig <+> fullscreenEventHook,
+    handleEventHook    = handleEventHook desktopConfig,
     manageHook         = myManageHook,
     layoutHook         = myLayoutHook,
     focusedBorderColor = "#00b9cd",
@@ -71,7 +71,7 @@ main = do
         ppHiddenNoWindows = xmobarColor "#586e75" ""
       }
                          } `additionalKeysP` [
-      ("M-<F2>",                    spawn "albert toggle"),
+      ("M-<F2>",                  spawn "albert toggle"),
       ("<Print>",                 spawn "flameshot gui"),
       ("<XF86AudioMute>",         spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle"),
       ("<XF86AudioRaiseVolume>",  spawn "pactl set-sink-volume @DEFAULT_SINK@ +5%"),

@@ -6,8 +6,8 @@ function run {
     $@&
   fi
 }
-# increase trackpoint sensitivity
-xinput set-prop "PS/2 Generic Mouse" "Device Accel Constant Deceleration" 0.5
+# increase trackpoint sensitivity on Lenovo Keyboard
+# xinput set-prop "PS/2 Generic Mouse" "Device Accel Constant Deceleration" 0.5
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 
@@ -18,7 +18,7 @@ run pasystray --notify=sink_default
 run copyq
 run nm-applet
 run guake
-run indicator-kdeconnect
+# run indicator-kdeconnect
 run stalonetray
 run qxkb
 run slack
